@@ -1,35 +1,119 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { MainLayout } from "./components/layout/MainLayout";
+import { Provider as ReduxProvider } from "react-redux";
+import {store} from "./redux/store";
+import { Toaster } from "react-hot-toast";
+import SignUp from "./pages/SignUp";
+// Pages
+import Login from "./pages/Login";
+// import Dashboard from './pages/Dashboard';
+// import Patients from './pages/Patients';
+// import DietCharts from './pages/DietCharts';
+// import Deliveries from './pages/Deliveries';
 
-function App() {
-  const [count, setCount] = useState(0)
+const queryClient = new QueryClient();
 
+const ProtectedRoute: React.FC<{
+  children: React.ReactNode;
+  allowedRoles?: string[];
+}> = ({ children, allowedRoles }) => {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/unauthorized" />;
+  }
+
+  return <>{children}</>;
+};
+
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <ReduxProvider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <BrowserRouter>
+            <Toaster position="top-right" />
+            <MainLayout>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/sign-up" element={<SignUp />} />
 
-export default App
+                {/* Protected Routes */}
+                {/* <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Dashboard />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            /> */}
+
+                {/* Manager Routes */}
+                {/* <Route
+              path="/patients"
+              element={
+                <ProtectedRoute allowedRoles={['manager']}>
+                  <MainLayout>
+                    <Patients />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            /> */}
+
+                {/* <Route
+              path="/diet-charts"
+              element={
+                <ProtectedRoute allowedRoles={['manager']}>
+                  <MainLayout>
+                    <DietCharts />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            /> */}
+
+                {/* Pantry Routes */}
+                {/* <Route
+              path="/kitchen-tasks"
+              element={
+                <ProtectedRoute allowedRoles={['pantry']}>
+                  <MainLayout>
+                    <DietCharts />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            /> */}
+
+                {/* Delivery Routes */}
+                {/* <Route
+              path="/deliveries"
+              element={
+                <ProtectedRoute allowedRoles={['delivery']}>
+                  <MainLayout>
+                    <Deliveries />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            /> */}
+              </Routes>
+            </MainLayout>
+          </BrowserRouter>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ReduxProvider>
+  );
+};
+
+export default App;
