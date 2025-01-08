@@ -7,8 +7,12 @@ import { config } from 'dotenv';
 import { connectDatabase } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
 import {logger} from "./utils/Logger"
-import authRoutes from './routes/auth.ts';
-// import patientRoutes from './routes/patient';
+import authRoutes from './routes/auth';
+import managerRoutes from './routes/manager';
+import pantryRoutes from './routes/pantry';
+import dotenv from 'dotenv';
+
+dotenv.config();
 // import dietRoutes from './routes/diet';
 // import deliveryRoutes from './routes/delivery';
 
@@ -29,8 +33,8 @@ app.use(morgan('dev')) // HTTP request logger
 
 
 app.use('/api/auth', authRoutes);
-// app.use('/api/patients', patientRoutes);
-// app.use('/api/diets', dietRoutes);
+app.use('/api/manager', managerRoutes);
+app.use('/api/pantry', pantryRoutes);
 // app.use('/api/deliveries', deliveryRoutes);
 
 // Error handling middleware

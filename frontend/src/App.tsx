@@ -8,7 +8,7 @@ import { Toaster } from "react-hot-toast";
 import SignUp from "./pages/SignUp";
 // Pages
 import Login from "./pages/Login";
-// import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard';
 // import Patients from './pages/Patients';
 // import DietCharts from './pages/DietCharts';
 // import Deliveries from './pages/Deliveries';
@@ -47,8 +47,9 @@ const App: React.FC = () => {
               <Routes>
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
-                <Route path="/sign-up" element={<SignUp />} />
 
+                <Route path="/sign-up" element={<SignUp />} />
+                <Route path="/dash" element={<Dashboard />} />
                 {/* Protected Routes */}
                 {/* <Route
               path="/"

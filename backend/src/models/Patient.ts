@@ -6,7 +6,7 @@ type IEmergencyContact={
     contact: string;
 }
 
-interface IPatient extends Document {
+export interface IPatient extends Document {
   name: string;
   diseases: string[];
   allergies: string[];

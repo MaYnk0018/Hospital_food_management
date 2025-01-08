@@ -103,7 +103,7 @@ export const login = asyncHandler(async (
 
   // Generate token
   const token = jwt.sign(
-    { userId: user._id, role: user.role },
+    { userId: user._id, role: user.role ,email: user.email},
     process.env.JWT_SECRET as string,
     { expiresIn: '24h' }
   );

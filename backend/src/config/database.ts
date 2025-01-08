@@ -1,6 +1,9 @@
 //database config file
 import { logger } from "@/utils/Logger";
 import mongoose from "mongoose";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 
 interface DatabaseConfig {
@@ -9,7 +12,7 @@ interface DatabaseConfig {
 }
 
 export const dbConfig: DatabaseConfig = {
-  url: process.env.MONGODB_URI || "mongodb+srv://mmayankconnect:s3c9p1IjMMv9hfoR@cluster0.edkq9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+  url: process.env.MONGODB_URI,
   options: {
     autoIndex: true,
   },
