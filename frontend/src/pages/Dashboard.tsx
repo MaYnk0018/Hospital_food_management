@@ -1,289 +1,317 @@
-import React, { useState } from 'react';
-import { 
-  Plus, X, Edit, AlertCircle, Calendar, Trash2, 
-  UserCheck, ClipboardList, ChefHat 
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  ClipboardList,
+  Users,
+  TruckIcon,
+  Calendar,
+  PlusCircle,
+  FileText,
+} from "lucide-react";
+import { AddPatientForm } from "./addPatientform";
 
-// Types
-interface MealItem {
-  name: string;
-  ingredients: string[];
-  specialInstructions: string[];
-}
-
-interface Meal {
-  items: MealItem[];
-  status: "pending" | "preparing" | "delivered";
+// Type definitions
+interface DashboardStats {
+  totalActivePatients: number;
+  todayDeliveries: number;
+  pendingDeliveries: number;
+  dietPlansToday: number;
+  mealStatus: {
+    pending: number;
+    preparing: number;
+    delivered: number;
+  };
 }
 
 interface Patient {
-  id: string;
+  _id: string;
   name: string;
-  diseases: string[];
-  allergies: string[];
   roomNumber: string;
-  bedNumber: string;
-  floorNumber: string;
-  age: number;
-  gender: string;
-  contactInfo: string;
-  emergencyContact: {
-    name: string;
-    relation: string;
-    contact: string;
-  };
-  status: 'active' | 'discharged';
+  status: "active" | "inactive";
+  dietaryRestrictions: string[];
 }
 
-// Modal Component
-const Modal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-}> = ({ isOpen, onClose, title, children }) => {
-  if (!isOpen) return null;
+interface DeliveryTrend {
+  name: string;
+  deliveries: number;
+}
+
+interface PatientListProps {
+  onSelectPatient: (patientId: string) => void;
+}
+
+// Patient List Component
+const PatientList: React.FC<PatientListProps> = ({ onSelectPatient }) => {
+  const [patients, setPatients] = useState<Patient[]>([]);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch("/api/patients");
+        const data = await response.json();
+        if (data.success) {
+          setPatients(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch patients:", error);
+      }
+    };
+
+    fetchPatients();
+  }, []);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-3xl">
-        <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X className="w-5 h-5" />
-          </button>
+    <div className="space-y-4">
+      {patients.map((patient) => (
+        <div
+          key={patient._id}
+          className="p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-gray-50"
+          onClick={() => onSelectPatient(patient._id)}
+        >
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="font-medium">{patient.name}</h3>
+              <p className="text-sm text-gray-500">
+                Room: {patient.roomNumber}
+              </p>
+            </div>
+            <Button variant="outline" size="sm">
+              <FileText className="h-4 w-4 mr-2" />
+              View Diet Plan
+            </Button>
+          </div>
         </div>
-        <div className="p-4">{children}</div>
-      </div>
+      ))}
     </div>
   );
 };
 
-// Diet Plan Form Component
-const DietPlanForm: React.FC<{
-  patient: Patient;
-  onSubmit: (data: any) => void;
-}> = ({ patient, onSubmit }) => {
-  const mealTimes = ['morning', 'evening', 'night'];
-  const [selectedMeal, setSelectedMeal] = useState(mealTimes[0]);
-
-  return (
-    <form className="space-y-4">
-      <div className="flex gap-4 mb-4">
-        {mealTimes.map(meal => (
-          <button
-            key={meal}
-            type="button"
-            className={`px-4 py-2 rounded-lg ${
-              selectedMeal === meal 
-                ? 'bg-indigo-600 text-white' 
-                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-            }`}
-            onClick={() => setSelectedMeal(meal)}
-          >
-            {meal.charAt(0).toUpperCase() + meal.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Meal Items
-          </label>
-          <div className="space-y-2">
-            {['Main Course', 'Side Dish', 'Dessert'].map((item, index) => (
-              <div key={index} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder={item}
-                  className="flex-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"
-                />
-                <input
-                  type="text"
-                  placeholder="Special Instructions"
-                  className="flex-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Dietary Restrictions
-          </label>
-          <div className="flex gap-2 flex-wrap">
-            {patient.allergies.map((allergy, index) => (
-              <span
-                key={index}
-                className="px-3 py-1 rounded-full bg-red-100 text-red-800 text-sm"
-              >
-                {allergy}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700"
-        >
-          Save Diet Plan
-        </button>
-      </div>
-    </form>
-  );
-};
-
-// Patient List with Actions
-const PatientList: React.FC = () => {
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [showDietModal, setShowDietModal] = useState(false);
-  const [showPatientModal, setShowPatientModal] = useState(false);
-
-  // Mock data - replace with API calls
-  const patients: Patient[] = [
-    {
-      id: '1',
-      name: 'John Doe',
-      diseases: ['Diabetes'],
-      allergies: ['Nuts', 'Dairy'],
-      roomNumber: '201',
-      bedNumber: 'A',
-      floorNumber: '2',
-      age: 45,
-      gender: 'Male',
-      contactInfo: '123-456-7890',
-      emergencyContact: {
-        name: 'Jane Doe',
-        relation: 'Spouse',
-        contact: '098-765-4321'
-      },
-      status: 'active'
+const ManagerDashboard = () => {
+  const [stats, setStats] = useState<DashboardStats>({
+    totalActivePatients: 0,
+    todayDeliveries: 0,
+    pendingDeliveries: 0,
+    dietPlansToday: 0,
+    mealStatus: {
+      pending: 0,
+      preparing: 0,
+      delivered: 0,
     },
-    // Add more mock patients...
+  });
+
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
+    null
+  );
+  const [showAddPatient, setShowAddPatient] = useState(false);
+
+  const deliveryTrend: DeliveryTrend[] = [
+    { name: "6AM", deliveries: 4 },
+    { name: "9AM", deliveries: 8 },
+    { name: "12PM", deliveries: 15 },
+    { name: "3PM", deliveries: 12 },
+    { name: "6PM", deliveries: 18 },
+    { name: "9PM", deliveries: 7 },
   ];
 
-  const handleDietPlanSubmit = (data: any) => {
-    console.log('Diet plan submitted:', data);
-    setShowDietModal(false);
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const response = await fetch("/api/dashboard/stats");
+        const data = await response.json();
+        if (data.success) {
+          setStats(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats:", error);
+      }
+    };
+
+    fetchDashboardStats();
+    const interval = setInterval(fetchDashboardStats, 300000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handlePatientSelect = (patientId: string) => {
+    setSelectedPatientId(patientId);
+    // Navigate to patient diet plan view or open modal
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-serif text-gray-900 dark:text-white">
-          Patient Management
-        </h1>
-        <button
-          onClick={() => setShowPatientModal(true)}
-          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
-        >
-          <Plus className="w-5 h-5" />
-          Add Patient
-        </button>
-      </div>
-
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b dark:border-gray-700">
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Patient
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Room
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {patients.map((patient) => (
-                <tr key={patient.id} className="border-b dark:border-gray-700">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-gray-900 dark:text-white">
-                        {patient.name}
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {patient.diseases.join(', ')}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-gray-900 dark:text-white">
-                      Room {patient.roomNumber}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      Bed {patient.bedNumber}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-sm ${
-                      patient.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {patient.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setSelectedPatient(patient);
-                          setShowDietModal(true);
-                        }}
-                        className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"
-                        title="Manage Diet Plan"
-                      >
-                        <ClipboardList className="w-5 h-5" />
-                      </button>
-                      <button
-                        className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-                        title="Edit Patient"
-                      >
-                        <Edit className="w-5 h-5" />
-                      </button>
-                      <button
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                        title="Discharge Patient"
-                      >
-                        <UserCheck className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+      {/* Header with Actions */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Manager Dashboard</h1>
+        <div className="flex items-center space-x-4">
+          <Dialog>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Add New Patient</DialogTitle>
+              </DialogHeader>
+              <AddPatientForm onClose={() => setShowAddPatient(false)} />
+            </DialogContent>
+          </Dialog>
+          <span className="text-sm text-gray-500">
+            Last updated: {new Date().toLocaleTimeString()}
+          </span>
         </div>
       </div>
 
-      {/* Diet Plan Modal */}
-      <Modal
-        isOpen={showDietModal}
-        onClose={() => setShowDietModal(false)}
-        title={`Diet Plan - ${selectedPatient?.name}`}
-      >
-        {selectedPatient && (
-          <DietPlanForm
-            patient={selectedPatient}
-            onSubmit={handleDietPlanSubmit}
-          />
-        )}
-      </Modal>
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Active Patients
+                </p>
+                <h3 className="text-2xl font-bold">
+                  {stats.totalActivePatients}
+                </h3>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Add/Edit Patient Modal would go here */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <TruckIcon className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Today's Deliveries
+                </p>
+                <h3 className="text-2xl font-bold">{stats.todayDeliveries}</h3>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <ClipboardList className="h-6 w-6 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Pending Deliveries
+                </p>
+                <h3 className="text-2xl font-bold">
+                  {stats.pendingDeliveries}
+                </h3>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Calendar className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Diet Plans Today
+                </p>
+                <h3 className="text-2xl font-bold">{stats.dietPlansToday}</h3>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Charts Section */}
+        <div className="lg:col-span-2 space-y-6">
+          
+
+          {/* Meal Status Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Today's Meal Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {Object.entries(stats.mealStatus).map(([status, count]) => (
+                  <div
+                    key={status}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="text-sm font-medium capitalize">
+                      {status}
+                    </span>
+                    <div className="flex items-center">
+                      <div className="w-48 h-2 bg-gray-200 rounded-full mr-2">
+                        <div
+                          className={`h-full rounded-full ${
+                            status === "pending"
+                              ? "bg-yellow-400"
+                              : status === "preparing"
+                              ? "bg-blue-400"
+                              : "bg-green-400"
+                          }`}
+                          style={{
+                            width: `${
+                              (count /
+                                (stats.mealStatus.pending +
+                                  stats.mealStatus.preparing +
+                                  stats.mealStatus.delivered)) *
+                              100
+                            }%`,
+                          }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium">{count}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Patient List Section */}
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Active Patients</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PatientList onSelectPatient={handlePatientSelect} />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
 
-export default PatientList;
+export default ManagerDashboard;
