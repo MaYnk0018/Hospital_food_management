@@ -93,8 +93,8 @@ export const PatientDietView: React.FC<PatientDietViewProps> = ({
               <div key={mealTime} className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-medium capitalize">{mealTime}</h3>
-                  <Badge className={getStatusColor(meal.meals.morning.status)}>
-                    {meal.meals.morning.status}
+                  <Badge className={getStatusColor(meal.status)}>
+                    {meal.status}
                   </Badge>
                 </div>
 
@@ -107,7 +107,7 @@ export const PatientDietView: React.FC<PatientDietViewProps> = ({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {meal.meals.morning.items.map((item, index) => (
+                    {meal.items.map((item, index) => (
                       <TableRow key={index}>
                         <TableCell className="font-medium">
                           {item.name}

@@ -94,7 +94,7 @@ const DeliveryManagement = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/delivery/assignments/${deliveryId}/status`,
+        `${import.meta.env.VITE_API_URL}/api/deliveries/assignments/${deliveryId}/status`,
         {
           method: "PUT",
           headers: {

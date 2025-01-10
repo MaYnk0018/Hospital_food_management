@@ -128,7 +128,7 @@ const MealPreparationCard: React.FC<IMeals> = ({
 
       // Send all delivery person details and meal information in a single request
       const response = await fetch(
-        `process.env.BACKEND_URL}/api/pantry/deliveries/assign`,
+        `${import.meta.env.VITE_API_URL}/api/pantry/deliveries/assign`,
         {
           method: "POST",
           headers: {

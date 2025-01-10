@@ -27,9 +27,7 @@ const app: Express = express();
 // Middleware
 app.use(helmet()); // Security headers
 app.use(compression()); // Compress responses
-app.use(cors({
-  origin: 'https://localhost:3000'  // Frontend URL
-}));
+app.use(cors());
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('dev')) // HTTP request logger

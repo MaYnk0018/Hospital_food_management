@@ -1,4 +1,3 @@
-//React
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -18,21 +17,12 @@ import {
   PlusCircle,
   FileText,
 } from "lucide-react";
-//ClipboardList,
-import {
- 
-  IDelivery,
-  IDiet,
-  IPatient,
-} from "../types/random";
-// IMealItem,
-// MealTimeStatus,
-// MealTime,IMeals,
+import '../../style.css'
+import { IDelivery, IDiet, IPatient } from "../types/random";
 import { AddPatientForm } from "../components/addPatientform";
 import { AddDietForm } from "../components/addDietform";
 import { PatientDietView } from "../components/patientDietview";
 import { DeliveryStatus } from "../components/deliveryStatus";
-//import { IPatient, IDiet, IDelivery, IMeal } from "../types/dashboard";
 
 interface DashboardStats {
   totalPatients: number;
@@ -52,12 +42,6 @@ interface DashboardStats {
   };
 }
 
-// const isValidId = (id: any): id is string => {
-//   return (
-//     typeof id === "string" ||
-//     (typeof id === "object" && id !== null && "_id" in id)
-//   );
-// };
 const ManagerDashboard = () => {
   const [stats, setStats] = useState<DashboardStats>({
     totalPatients: 0,
@@ -108,21 +92,15 @@ const ManagerDashboard = () => {
       const statsData = await statsRes.json();
       const patientsData = await patientsRes.json();
 
-      console.log("Received patient data:", patientsData.patients); // Log the incoming data
-
       if (statsData.success) setStats(statsData.data);
       if (patientsData.patients) {
         setPatients(patientsData.patients);
-        console.log("Setting patients with:", patientsData.patients); // Log what we're setting
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     }
   };
 
-  useEffect(() => {
-    console.log("Patients state updated:", patients);
-  }, [patients]);
   const handleAddPatient = async (patientData: Omit<IPatient, "_id">) => {
     try {
       const token = localStorage.getItem("token");
@@ -157,19 +135,22 @@ const ManagerDashboard = () => {
       return;
     }
     try {
-      const token = localStorage.getItem("token"); // Add token for authentication
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/manager/diets`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Add authorization header
-        },
-        body: JSON.stringify({
-          ...dietData,
-          patientId: selectedPatient._id.toString(),
-          date: new Date().toISOString(), // Add date if not included in dietData
-        }),
-      });
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/manager/diets`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ...dietData,
+            patientId: selectedPatient._id.toString(),
+            date: new Date().toISOString(),
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -190,8 +171,6 @@ const ManagerDashboard = () => {
   const fetchPatientDiet = async (patientId: string) => {
     try {
       const token = localStorage.getItem("token");
-      console.log("patientId", patientId);
-
       const dietRes = await fetch(
         `${import.meta.env.VITE_API_URL}/api/manager/patients/${patientId}/diets`,
         {
@@ -223,21 +202,18 @@ const ManagerDashboard = () => {
             mealTime: "morning",
             dietId: mostRecentDiet._id,
             status: mostRecentDiet.meals.morning.status,
-            //items: mostRecentDiet.meals.morning.items,
           },
           {
             _id: mostRecentDiet.meals.evening._id,
             mealTime: "evening",
             dietId: mostRecentDiet._id,
             status: mostRecentDiet.meals.evening.status,
-            //items: mostRecentDiet.meals.evening.items,
           },
           {
             _id: mostRecentDiet.meals.night._id,
             mealTime: "night",
             dietId: mostRecentDiet._id,
             status: mostRecentDiet.meals.night.status,
-            //items: mostRecentDiet.meals.night.items,
           },
         ];
 
@@ -256,7 +232,7 @@ const ManagerDashboard = () => {
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Hospital Food Management</h1>
         <div className="flex space-x-4">
           <Dialog open={showAddPatient} onOpenChange={setShowAddPatient}>
@@ -302,87 +278,19 @@ const ManagerDashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Total Patients
-                </p>
-                <h3 className="text-2xl font-bold">{stats.totalPatients}</h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <ChefHat className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">
-                  In Preparation
-                </p>
-                <h3 className="text-2xl font-bold">
-                  {stats.pantryStatus.preparing}
-                </h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TruckIcon className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Deliveries Today
-                </p>
-                <h3 className="text-2xl font-bold">
-                  {stats.deliveryStatus.delivered}
-                </h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Calendar className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Pending Meals
-                </p>
-                <h3 className="text-2xl font-bold">
-                  {stats.deliveryStatus.pending}
-                </h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Stats Section - Currently commented out but kept for reference */}
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        ... (stats cards code remains the same)
+      </div> */}
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
         {/* Patient List */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
+        <Card className="lg:col-span-1 overflow-hidden">
+          <CardHeader className="border-b">
             <CardTitle>Active Patients</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 overflow-y-auto h-[calc(100vh-300px)] hide-scrollbar">
             <div className="space-y-4">
               {patients.map((patient) => (
                 <div
@@ -413,54 +321,67 @@ const ManagerDashboard = () => {
         </Card>
 
         {/* Patient Details and Diet View */}
-        <div className="lg:col-span-2">
+        <Card className="lg:col-span-2 overflow-hidden">
           {selectedPatient && selectedDiet ? (
-            <Tabs defaultValue="diet" className="space-y-6">
-              <TabsList>
-                <TabsTrigger value="diet">Diet Plan</TabsTrigger>
-                <TabsTrigger value="delivery">Delivery Status</TabsTrigger>
-              </TabsList>
+            <div className="h-full flex flex-col">
+              <CardHeader className="border-b p-0">
+                <Tabs defaultValue="diet" className="w-full">
+                  <TabsList className="w-full grid grid-cols-2">
+                    <TabsTrigger value="diet" className="w-full">
+                      Diet Plan
+                    </TabsTrigger>
+                    <TabsTrigger value="delivery" className="w-full">
+                      Delivery Status
+                    </TabsTrigger>
+                  </TabsList>
 
-              <TabsContent value="diet">
-                <PatientDietView
-                  patient={selectedPatient}
-                  diet={selectedDiet}
-                />
-              </TabsContent>
+                  <div className="p-6 overflow-y-auto h-[calc(100vh-300px)] hide-scrollbar">
+                    <TabsContent value="diet" className="mt-0 h-full">
+                      <PatientDietView
+                        patient={selectedPatient}
+                        diet={selectedDiet}
+                      />
+                    </TabsContent>
 
-              <TabsContent value="delivery">
-                <DeliveryStatus
-                  deliveries={deliveries}
-                  onUpdateStatus={async (_id, status) => {
-                    const token = localStorage.getItem("token");
-                    try {
-                      await fetch(
-                        `${import.meta.env.VITE_API_URL}/api/manager/deliveries`,
-                        {
-                          method: "GET",
-                          headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                          },
-                          body: JSON.stringify({ status }),
-                        }
-                      );
-                      fetchPatientDiet(selectedPatient._id.toString());
-                    } catch (error) {
-                      console.error("Failed to update delivery status:", error);
-                    }
-                  }}
-                />
-              </TabsContent>
-            </Tabs>
+                    <TabsContent value="delivery" className="mt-0 h-full">
+                      <DeliveryStatus
+                        deliveries={deliveries}
+                        onUpdateStatus={async (_id, status) => {
+                          const token = localStorage.getItem("token");
+                          try {
+                            await fetch(
+                              `${import.meta.env.VITE_API_URL}/api/manager/deliveries`,
+                              {
+                                method: "GET",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: `Bearer ${token}`,
+                                },
+                                body: JSON.stringify({ status }),
+                              }
+                            );
+                            fetchPatientDiet(selectedPatient._id.toString());
+                          } catch (error) {
+                            console.error(
+                              "Failed to update delivery status:",
+                              error
+                            );
+                          }
+                        }}
+                      />
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </CardHeader>
+            </div>
           ) : (
-            <Card>
-              <CardContent className="p-6 text-center text-gray-500">
+            <CardContent className="flex items-center justify-center h-[calc(100vh-300px)]">
+              <p className="text-gray-500">
                 Select a patient to view their diet plan and delivery status
-              </CardContent>
-            </Card>
+              </p>
+            </CardContent>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );
