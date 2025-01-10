@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
+
+
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  console.log("idText", req.user?.userId);
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
@@ -10,7 +13,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-    req.user = decoded as { id: string; role: string; email: string };
+    req.user = decoded as { userId: string; role: string; email: string };
     next();
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });

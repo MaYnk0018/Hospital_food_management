@@ -53,8 +53,11 @@ router.get('/patients/:id', asyncHandler(async (req: Request<{ id: string }>, re
 }));
 
 router.get('/patients', asyncHandler(async (req: Request, res: Response) => {
-  const patients = await controller.getAllPatients(req, res);
-  res.json(patients);
+  const patients = await controller.getAllPatients();
+  if(!patients) {
+    return res.status(404).json({ message: 'No patients found' });
+  }
+  return res.status(200).json({ patients });
 }));
 
 // Diet routes

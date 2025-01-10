@@ -1,32 +1,39 @@
-import { Request, Response } from 'express';
-import { Diet } from '../models/Diet';
-import { Delivery } from '../models/Delivery';
-import { User } from '../models/User';
-import { logger } from '../utils/Logger';
+import { Request, Response } from "express";
+import { Diet } from "../models/Diet";
+import { Delivery } from "../models/Delivery";
+import { User } from "../models/User";
+import { logger } from "../utils/Logger";
 
 export class PantryController {
   async getAllMealPreparations(req: Request, res: Response) {
     const preparations = await Diet.find()
-      .populate('patientId', 'name roomNumber bedNumber')
-      .select('meals date');
-    logger.info('Fetched all meal preparations');
+      .populate("patientId", "name roomNumber bedNumber")
+      .select("meals date");
+    logger.info("Fetched all meal preparations");
     return preparations;
   }
 
-  async getMealPreparationById(req: Request<{ dietId: string }>, res: Response) {
-    const preparation = await Diet.findById(req.params.dietId).populate('patientId');
+  async getMealPreparationById(
+    req: Request<{ dietId: string }>,
+    res: Response
+  ) {
+    const preparation = await Diet.findById(req.params.dietId).populate(
+      "patientId"
+    );
 
     if (!preparation) {
-      logger.error('Meal preparation not found', { dietId: req.params.dietId });
-      return res.status(404).json({ message: 'Meal preparation not found' });
+      logger.error("Meal preparation not found", { dietId: req.params.dietId });
+      return res.status(404).json({ message: "Meal preparation not found" });
     }
 
-    logger.info('Fetched meal preparation by ID', { dietId: req.params.dietId });
+    logger.info("Fetched meal preparation by ID", {
+      dietId: req.params.dietId,
+    });
     return preparation;
   }
 
   async updateMealStatus(
-    req: Request<{ dietId: string; mealTime: 'morning' | 'evening' | 'night' }>,
+    req: Request<{ dietId: string; mealTime: "morning" | "evening" | "night" }>,
     res: Response
   ) {
     const { dietId, mealTime } = req.params;
@@ -40,39 +47,52 @@ export class PantryController {
     );
 
     if (!updatedDiet) {
-      logger.error('Diet not found', { dietId });
-      return res.status(404).json({ message: 'Diet not found' });
+      logger.error("Diet not found", { dietId });
+      return res.status(404).json({ message: "Diet not found" });
     }
 
-    logger.info('Updated meal status', { dietId, mealTime, status });
+    logger.info("Updated meal status", { dietId, mealTime, status });
     return updatedDiet;
   }
 
   async assignDelivery(req: Request, res: Response) {
-    const { dietId, deliveryPersonnelId, mealTime } = req.body;
+    try {
+      const { email, name, contact, dietId, mealTime } = req.body;
 
-    const deliveryPerson = await User.findById(deliveryPersonnelId);
-    if (!deliveryPerson) {
-      logger.error('Delivery personnel not found', { deliveryPersonnelId });
-      return res.status(404).json({ message: 'Delivery personnel not found' });
+      // First check if delivery person exists with this email
+      let deliveryPerson = await User.findOne({ email });
+
+      if (!deliveryPerson) {
+        // If not found, create a new delivery person
+        console.log("No delivery person found")
+      }
+
+      // Create the delivery assignment
+      const delivery = await Delivery.create({
+        dietId,
+        assignedTo: deliveryPerson?._id,
+        mealTime,
+        status: "assigned",
+      });
+
+      logger.info("Assigned delivery", {
+        dietId,
+        deliveryPersonId: deliveryPerson?._id,
+        mealTime,
+      });
+
+      return res.status(201).json(delivery);
+    } catch (error) {
+      logger.error("Error in delivery assignment", { error });
+      return res.status(500).json({ message: "Error assigning delivery" });
     }
-
-    const delivery = await Delivery.create({
-      dietId,
-      assignedTo: deliveryPersonnelId,
-      mealTime,
-      status: 'assigned',
-    });
-
-    logger.info('Assigned delivery', { dietId, deliveryPersonnelId, mealTime });
-    return delivery;
   }
 
   async getAllDeliveries(req: Request, res: Response) {
     const deliveries = await Delivery.find()
-      .populate('dietId')
-      .populate('assignedTo', 'name phoneNumber');
-    logger.info('Fetched all deliveries');
+      .populate("dietId")
+      .populate("assignedTo", "name phoneNumber");
+    logger.info("Fetched all deliveries");
     return deliveries;
   }
 
@@ -83,17 +103,21 @@ export class PantryController {
       {
         status,
         notes,
-        ...(status === 'delivered' && { deliveredAt: new Date() }),
+        ...(status === "delivered" && { deliveredAt: new Date() }),
       },
       { new: true }
     );
 
     if (!delivery) {
-      logger.error('Delivery not found', { id: req.params.id });
-      return res.status(404).json({ message: 'Delivery not found' });
+      logger.error("Delivery not found", { id: req.params.id });
+      return res.status(404).json({ message: "Delivery not found" });
     }
 
-    logger.info('Updated delivery status', { id: req.params.id, status, notes });
+    logger.info("Updated delivery status", {
+      id: req.params.id,
+      status,
+      notes,
+    });
     return delivery;
   }
 
@@ -111,21 +135,21 @@ export class PantryController {
       Diet.countDocuments({
         date: today,
         $or: [
-          { 'meals.morning.status': 'pending' },
-          { 'meals.evening.status': 'pending' },
-          { 'meals.night.status': 'pending' },
+          { "meals.morning.status": "pending" },
+          { "meals.evening.status": "pending" },
+          { "meals.night.status": "pending" },
         ],
       }),
       Delivery.countDocuments({
-        status: 'delivered',
+        status: "delivered",
         deliveredAt: { $gte: today },
       }),
       Delivery.countDocuments({
-        status: { $in: ['assigned', 'in-progress'] },
+        status: { $in: ["assigned", "in-progress"] },
       }),
     ]);
 
-    logger.info('Fetched pantry stats', {
+    logger.info("Fetched pantry stats", {
       totalPreparations,
       pendingPreparations,
       completedDeliveries,
@@ -144,10 +168,10 @@ export class PantryController {
   }
 
   async getPantryStaff(req: Request, res: Response) {
-    const staff = await User.find({ role: 'pantry_staff' }).select(
-      'name phoneNumber status currentTask'
+    const staff = await User.find({ role: "pantry_staff" }).select(
+      "name phoneNumber status currentTask"
     );
-    logger.info('Fetched pantry staff');
+    logger.info("Fetched pantry staff");
     return staff;
   }
 
@@ -167,11 +191,11 @@ export class PantryController {
     );
 
     if (!staff) {
-      logger.error('Staff member not found', { staffId });
-      return res.status(404).json({ message: 'Staff member not found' });
+      logger.error("Staff member not found", { staffId });
+      return res.status(404).json({ message: "Staff member not found" });
     }
 
-    logger.info('Assigned staff to task', { staffId, taskType, dietId });
+    logger.info("Assigned staff to task", { staffId, taskType, dietId });
     return staff;
   }
 }

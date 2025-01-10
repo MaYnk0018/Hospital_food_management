@@ -1,14 +1,23 @@
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { toggleTheme, setTheme, ThemeMode } from '../../redux/theme/themeSlice';
+
 
 const Header = () => {
-  const [theme, setTheme] = React.useState('light');
+  //const [theme, setTheme] = React.useState('light');
 
-  const handleThemeToggle = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  const handleToggleTheme = () => {
+    dispatch(toggleTheme());
   };
+
+  const handleSetTheme = (newTheme: ThemeMode) => {
+    dispatch(setTheme(newTheme));
+  };
+
+  const dispatch= useDispatch();
+  const theme = useSelector((state: RootState)=> state.theme.theme);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
@@ -24,7 +33,7 @@ const Header = () => {
           </div>
           </span>
           <button
-            onClick={handleThemeToggle}
+            onClick={()=>dispatch(toggleTheme())}
             type="button"
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
             aria-label="Toggle theme"

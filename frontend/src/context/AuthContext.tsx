@@ -1,39 +1,52 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { AuthContextType, User } from '../types/auth';
-import { api } from '../services/api';
+
+// Define proper types
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  contact?: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  login: (userData: User & { token: string }) => void;  // Changed to accept user data directly
+  logout: () => void;
+  isLoading: boolean;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
+  children 
+}) => {
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Initialize auth state from localStorage
   useEffect(() => {
-    const initAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const response = await api.get('/auth/me');
-          setUser(response.data.user);
-        } catch (error) {
-          localStorage.removeItem('token');
-        }
-      }
-      setIsLoading(false);
-    };
-
-    initAuth();
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
-    const { token, user } = response.data;
+  // Modified login to accept user data directly
+  const login = (userData: User & { token: string }) => {
+    const { token, ...userWithoutToken } = userData;
+    setUser(userWithoutToken);
     localStorage.setItem('token', token);
-    setUser(user);
+    localStorage.setItem('user', JSON.stringify(userWithoutToken));
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
   };
 

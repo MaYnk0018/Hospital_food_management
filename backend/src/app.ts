@@ -10,6 +10,7 @@ import {logger} from "./utils/Logger"
 import authRoutes from './routes/auth';
 import managerRoutes from './routes/manager';
 import pantryRoutes from './routes/pantry';
+import deliveryRoutes from './routes/delivery';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -35,7 +36,7 @@ app.use(morgan('dev')) // HTTP request logger
 app.use('/api/auth', authRoutes);
 app.use('/api/manager', managerRoutes);
 app.use('/api/pantry', pantryRoutes);
-// app.use('/api/deliveries', deliveryRoutes);
+app.use('/api/deliveries', deliveryRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

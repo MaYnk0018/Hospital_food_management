@@ -15,7 +15,8 @@ router.get(
   "/assignments",
   asyncHandler(async (req: Request, res: Response) => {
     const assignments = await controller.getDeliveryAssignments(req, res);
-    logger.info("Fetched delivery assignments", { userId: req.user?.id });
+    console.log("assignments",assignments);
+    logger.info("Fetched delivery assignments", { userId: req.user?.userId });
     res.json(assignments);
   })
 );
@@ -32,20 +33,20 @@ router.put(
   })
 );
 
-router.get(
-  "/history",
-  asyncHandler(async (req: Request, res: Response) => {
-    const history = await controller.getDeliveryHistory(req, res);
-    logger.info('Fetched delivery history', { userId: req.user?.id });
-    res.json(history);
-  })
-);
+// router.get(
+//   "/history",
+//   asyncHandler(async (req: Request, res: Response) => {
+//     const history = await controller.getDeliveryHistory(req, res);
+//     logger.info('Fetched delivery history', { userId: req.user?.userId });
+//     res.json(history);
+//   })
+// );
 
 router.get(
   "/current",
   asyncHandler(async (req: Request, res: Response) => {
     const current = await controller.getCurrentDelivery(req, res);
-    logger.info('Fetched current delivery', { userId: req.user?.id });
+    logger.info('Fetched current delivery', { userId: req.user?.userId });
     res.json(current);
   })
 );

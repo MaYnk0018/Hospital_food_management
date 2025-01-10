@@ -69,8 +69,7 @@ router.put(
 
 // Delivery routes
 router.post('/deliveries/assign', asyncHandler(async (req: Request, res: Response) => {
-  const delivery = await controller.assignDelivery(req, res);
-  res.status(201).json(delivery);
+  await controller.assignDelivery(req, res);
 }));
 
 router.get('/deliveries', asyncHandler(async (req: Request, res: Response) => {

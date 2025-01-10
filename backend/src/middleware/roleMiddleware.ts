@@ -7,14 +7,16 @@ interface User {
 }
 
 // Extend the Request interface to include the `user` property
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: User;
-  }
-}
+// declare module "express-serve-static-core" {
+//   interface Request {
+//     user?: User;
+//   }
+// }
 
 const roleMiddleware = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
+    console.log("user", req.user)
+    console.log("user", req.user?.role)
     if (!req.user || !roles.includes(req.user.role)) {
       res.status(403).json({ error: "Forbidden" });
       return;

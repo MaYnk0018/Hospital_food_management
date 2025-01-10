@@ -9,15 +9,19 @@ interface IDeliveryPersonnel {
   status: "available" | "delivering";
 }
 
+
+
 export class DeliveryController {
   async getDeliveryAssignments(req: Request, res: Response) {
-    const deliveryPersonId = req.user?.id;
-    
+    const deliveryPersonId = req.user?.userId;
+    console.log("idText", req.user?.userId);
+  
     if (!deliveryPersonId) {
       logger.error("User ID not found in request");
+      console.log("User ID not found in request");
       return res.status(401).json({ message: "Unauthorized" });
     }
-
+  
     const assignments = await Delivery.find({
       assignedTo: deliveryPersonId,
       status: { $ne: "delivered" },
@@ -30,7 +34,8 @@ export class DeliveryController {
         },
       })
       .sort({ mealTime: 1 });
-
+    console.log("assignments", assignments);
+  
     logger.debug("Retrieved assignments", { count: assignments.length });
     return assignments;
   }
@@ -38,7 +43,7 @@ export class DeliveryController {
   async updateDeliveryStatus(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const { status, notes } = req.body;
-    const deliveryPersonId = req.user?.id;
+    const deliveryPersonId = req.user?.userId;
 
     if (!deliveryPersonId) {
       logger.error("User ID not found in request");
@@ -85,52 +90,52 @@ export class DeliveryController {
     return updatedDelivery;
   }
 
-  async getDeliveryHistory(req: Request, res: Response) {
-    const deliveryPersonId = req.user?.id;
+  // async getDeliveryHistory(req: Request, res: Response) {
+  //   const deliveryPersonId = req.user?.userId;
 
-    if (!deliveryPersonId) {
-      logger.error("User ID not found in request");
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+  //   if (!deliveryPersonId) {
+  //     logger.error("User ID not found in request");
+  //     return res.status(401).json({ message: "Unauthorized" });
+  //   }
 
-    const { startDate, endDate } = req.query;
+  //   const { startDate, endDate } = req.query;
 
-    const query: any = {
-      assignedTo: deliveryPersonId,
-      status: "delivered",
-    };
+  //   const query: any = {
+  //     assignedTo: deliveryPersonId,
+  //     status: "delivered",
+  //   };
 
-    if (startDate && endDate) {
-      query.deliveredAt = {
-        $gte: new Date(startDate as string),
-        $lte: new Date(endDate as string),
-      };
-    }
+  //   if (startDate && endDate) {
+  //     query.deliveredAt = {
+  //       $gte: new Date(startDate as string),
+  //       $lte: new Date(endDate as string),
+  //     };
+  //   }
 
-    const history = await Delivery.find(query)
-      .populate({
-        path: "dietId",
-        populate: {
-          path: "patientId",
-          select: "name roomNumber bedNumber",
-        },
-      })
-      .sort({ deliveredAt: -1 });
+  //   const history = await Delivery.find(query)
+  //     .populate({
+  //       path: "dietId",
+  //       populate: {
+  //         path: "patientId",
+  //         select: "name roomNumber bedNumber",
+  //       },
+  //     })
+  //     .sort({ deliveredAt: -1 });
 
-    logger.info("Retrieved delivery history", {
-      userId: deliveryPersonId,
-      count: history.length,
-      dateRange: startDate && endDate ? { startDate, endDate } : "all",
-    });
+  //   logger.info("Retrieved delivery history", {
+  //     userId: deliveryPersonId,
+  //     count: history.length,
+  //     dateRange: startDate && endDate ? { startDate, endDate } : "all",
+  //   });
 
-    return {
-      totalDeliveries: history.length,
-      deliveries: history,
-    };
-  }
+  //   return {
+  //     totalDeliveries: history.length,
+  //     deliveries: history,
+  //   };
+  // }
 
   async getCurrentDelivery(req: Request, res: Response) {
-    const deliveryPersonId = req.user?.id;
+    const deliveryPersonId = req.user?.userId;
 
     if (!deliveryPersonId) {
       logger.error("User ID not found in request");
