@@ -28,7 +28,7 @@ const app: Express = express();
 app.use(helmet()); // Security headers
 app.use(compression()); // Compress responses
 app.use(cors({
-  origin: 'https://localhost:3000'  // Frontend URL
+  origin: 'https://hospital-food-management-eight.vercel.app/login'  // Frontend URL
 }));
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
