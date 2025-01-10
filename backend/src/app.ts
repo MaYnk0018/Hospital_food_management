@@ -28,7 +28,7 @@ const app: Express = express();
 app.use(helmet()); // Security headers
 app.use(compression()); // Compress responses
 app.use(cors({
-  origin: 'https://hospital-food-management-plum.vercel.app',
+  origin: 'https://hospital-food-management-plum.vercel.app/login',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true;
 }));
