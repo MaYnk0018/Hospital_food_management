@@ -1,5 +1,5 @@
 //database config file
-import { logger } from "@/utils/Logger";
+import { logger } from "../utils/Logger";
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
 

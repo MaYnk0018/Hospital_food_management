@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { DeliveryController } from "../controllers/deliveryController";
 import { authMiddleware } from "../middleware/authMiddleware";
 import roleMiddleware from "../middleware/roleMiddleware";
-import { asyncHandler } from "@/utils/asyncHandler";
+import { asyncHandler } from "../utils/asyncHandler";
 import { logger } from "../utils/Logger";
 
 const router = Router();

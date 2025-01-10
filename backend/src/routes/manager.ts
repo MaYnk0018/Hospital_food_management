@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { ManagerController } from '../controllers/managerController';
 import { authMiddleware } from '../middleware/authMiddleware';
 import roleMiddleware from '../middleware/roleMiddleware';
-import { asyncHandler } from '@/utils/asyncHandler';
+import { asyncHandler } from '../utils/asyncHandler';
 
 // Define interfaces for type safety
 interface Patient {

@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { PantryController } from '../controllers/pantryController';
 import { authMiddleware } from '../middleware/authMiddleware';
 import roleMiddleware from '../middleware/roleMiddleware';
-import { asyncHandler } from '@/utils/asyncHandler';
+import { asyncHandler } from '../utils/asyncHandler';
 
 // Interfaces for type safety
 interface MealItem {

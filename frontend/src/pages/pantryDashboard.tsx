@@ -1,7 +1,7 @@
 // pages/pantry-dashboard.tsx
 import { useState, useEffect } from "react";
 import { ChefHat, Truck, ClipboardList } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
 import { StatsCard } from "../components/stats-card";
 import MealPreparationCard from "../components/meal-preparation-card";
 import { DeliveryCard } from "../components/delivery-card";

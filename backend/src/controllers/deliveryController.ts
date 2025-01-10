@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Delivery, IDelivery } from "../models/Delivery";
 import mongoose from "mongoose";
-import { logger } from "@/utils/Logger";
+import { logger } from "../utils/Logger";
 
 interface IDeliveryPersonnel {
   id: string;

@@ -1,5 +1,5 @@
 import { Truck, User, MapPin, Phone } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { DeliveryCardProps } from "../types/random";
 
 export const DeliveryCard = ({
@@ -51,10 +51,10 @@ export const DeliveryCard = ({
             Delivery Location
           </h3>
           <div className="ml-6 space-y-1">
-            <p className="text-sm">Patient: {delivery.patientDetails?.name}</p>
+            <p className="text-sm">Patient: {delivery.dietId?.patientId.name}</p>
             <p className="text-sm text-gray-600">
-              Room {delivery.patientDetails?.roomNumber}, 
-              Bed {delivery.patientDetails?.bedNumber}
+              Room {delivery.dietId?.patientId.roomNumber}, 
+              Bed {delivery.dietId?.patientId.bedNumber}
             </p>
           </div>
         </div>

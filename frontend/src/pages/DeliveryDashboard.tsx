@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Textarea } from "../components/ui/textarea";
 import { CheckCircle, Clock, TruckIcon, X } from "lucide-react";
-import { IDelivery } from "@/types/random";
+import { IDelivery } from "../types/random";
 
 // Alert component
 interface AlertProps {
