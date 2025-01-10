@@ -1,27 +1,10 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "next.config.js",
-        "use": "@vercel/next"
-      },
-      {
-        "src": "api/**/*.ts",
-        "use": "@vercel/node"
-      }
-    ],
-    "rewrites": [
-      { "source": "/api/(.*)", "destination": "/api/$1" },
-      { "source": "/(.*)", "destination": "/" }
-    ],
-    "env": {
-      "DATABASE_URL": "@your-database-url",
-      "API_SECRET": "@your-api-secret"
-    },
-    "functions": {
-      "api/**/*.ts": {
-        "runtime": "nodejs16.x"
-      }
+  "version": 2,
+  "builds": [{ "src": "*.js", "use": "@vercel/node" }],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dist": "/"
     }
-  }
-  
+  ]
+}
