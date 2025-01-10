@@ -1,20 +1,20 @@
-import React from 'react';
+
 import { Moon, Sun } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { toggleTheme, setTheme, ThemeMode } from '../../redux/theme/themeSlice';
-
+import { toggleTheme } from '../../redux/theme/themeSlice';
+// setTheme, ThemeMode
 
 const Header = () => {
   //const [theme, setTheme] = React.useState('light');
 
-  const handleToggleTheme = () => {
-    dispatch(toggleTheme());
-  };
+  // const handleToggleTheme = () => {
+  //   dispatch(toggleTheme());
+  // };
 
-  const handleSetTheme = (newTheme: ThemeMode) => {
-    dispatch(setTheme(newTheme));
-  };
+  // const handleSetTheme = (newTheme: ThemeMode) => {
+  //   dispatch(setTheme(newTheme));
+  // };
 
   const dispatch= useDispatch();
   const theme = useSelector((state: RootState)=> state.theme.theme);

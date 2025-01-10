@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+//React
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import {
@@ -10,7 +11,6 @@ import {
 } from "../components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import {
-  ClipboardList,
   Users,
   ChefHat,
   TruckIcon,
@@ -18,15 +18,16 @@ import {
   PlusCircle,
   FileText,
 } from "lucide-react";
+//ClipboardList,
 import {
-  IMealItem,
-  MealTimeStatus,
-  MealTime,
+ 
   IDelivery,
-  IMeals,
   IDiet,
   IPatient,
 } from "../types/random";
+// IMealItem,
+// MealTimeStatus,
+// MealTime,IMeals,
 import { AddPatientForm } from "../components/addPatientform";
 import { AddDietForm } from "../components/addDietform";
 import { PatientDietView } from "../components/patientDietview";
@@ -430,7 +431,7 @@ const ManagerDashboard = () => {
               <TabsContent value="delivery">
                 <DeliveryStatus
                   deliveries={deliveries}
-                  onUpdateStatus={async (id, status) => {
+                  onUpdateStatus={async (_id, status) => {
                     const token = localStorage.getItem("token");
                     try {
                       await fetch(

@@ -1,6 +1,6 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; //useLocation
 import { useAuth } from "../context/AuthContext";
 
 interface LoginFormData {
@@ -16,7 +16,7 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
   const { login } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

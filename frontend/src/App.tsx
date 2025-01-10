@@ -11,8 +11,6 @@ import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import PantryDashboard from "./pages/pantryDashboard";
 import DeliveryManagement from "./pages/DeliveryDashboard";
-import { RootState } from "./redux/store";
-import { useSelector } from "react-redux";
 
 const queryClient = new QueryClient();
 

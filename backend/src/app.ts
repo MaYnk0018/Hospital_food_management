@@ -12,6 +12,7 @@ import managerRoutes from './routes/manager';
 import pantryRoutes from './routes/pantry';
 import deliveryRoutes from './routes/delivery';
 import dotenv from 'dotenv';
+import path = require('path');
 
 dotenv.config();
 // import dietRoutes from './routes/diet';
@@ -20,13 +21,15 @@ dotenv.config();
 
 // Load environment variables
 config();
-
+const _dirname= path.resolve();
 const app: Express = express();
 
 // Middleware
 app.use(helmet()); // Security headers
 app.use(compression()); // Compress responses
-app.use(cors()); // Enable CORS
+app.use(cors({
+  origin: 'https://localhost:3000'  // Frontend URL
+}));
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('dev')) // HTTP request logger
@@ -40,7 +43,10 @@ app.use('/api/deliveries', deliveryRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
-
+app.use(express.static(path.join(_dirname, "/frontend/dist")))
+app.get('*', (req,res)=>{
+  res.sendFile(path.resolve(_dirname,"frontend","dist","index.html"))
+})
 // Start server
 const PORT = process.env.PORT || 3000;
 

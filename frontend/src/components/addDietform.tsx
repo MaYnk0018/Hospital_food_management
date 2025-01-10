@@ -41,7 +41,7 @@ interface AddDietFormProps {
   onClose: () => void;
 }
 
-export const AddDietForm: React.FC<AddDietFormProps> = ({ patientId, onSubmit, onClose }) => {
+export const AddDietForm: React.FC<AddDietFormProps> = ({onSubmit, onClose }) => {
   const form = useForm({
     resolver: zodResolver(dietSchema),
     defaultValues: {

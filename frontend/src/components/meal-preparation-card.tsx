@@ -10,8 +10,8 @@ import {
 } from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { IMealItem, IMeals } from "../types/random";
-
+import { IMeals } from "../types/random";
+//IMealItem
 // interface Props {
 //   meal: {
 //     meals: {

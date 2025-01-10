@@ -33,23 +33,23 @@ export const PatientDietView: React.FC<PatientDietViewProps> = ({
     }
   };
 
-  const renderMealItems = (items: any[]) => (
-    <div className="space-y-2">
-      {items.map((item, index) => (
-        <div key={index} className="border-b pb-2 last:border-0">
-          <p className="font-medium">{item.name}</p>
-          <p className="text-sm text-gray-600">
-            Ingredients: {item.ingredients.join(", ")}
-          </p>
-          {item.specialInstructions.length > 0 && (
-            <p className="text-sm text-red-600">
-              Special Instructions: {item.specialInstructions.join(", ")}
-            </p>
-          )}
-        </div>
-      ))}
-    </div>
-  );
+  // const renderMealItems = (items: any[]) => (
+  //   <div className="space-y-2">
+  //     {items.map((item, index) => (
+  //       <div key={index} className="border-b pb-2 last:border-0">
+  //         <p className="font-medium">{item.name}</p>
+  //         <p className="text-sm text-gray-600">
+  //           Ingredients: {item.ingredients.join(", ")}
+  //         </p>
+  //         {item.specialInstructions.length > 0 && (
+  //           <p className="text-sm text-red-600">
+  //             Special Instructions: {item.specialInstructions.join(", ")}
+  //           </p>
+  //         )}
+  //       </div>
+  //     ))}
+  //   </div>
+  // );
 
   return (
     <div className="space-y-6">
@@ -93,8 +93,8 @@ export const PatientDietView: React.FC<PatientDietViewProps> = ({
               <div key={mealTime} className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-medium capitalize">{mealTime}</h3>
-                  <Badge className={getStatusColor(meal.status)}>
-                    {meal.status}
+                  <Badge className={getStatusColor(meal.meals.morning.status)}>
+                    {meal.meals.morning.status}
                   </Badge>
                 </div>
 
@@ -107,7 +107,7 @@ export const PatientDietView: React.FC<PatientDietViewProps> = ({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {meal.items.map((item, index) => (
+                    {meal.meals.morning.items.map((item, index) => (
                       <TableRow key={index}>
                         <TableCell className="font-medium">
                           {item.name}

@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store'; 
-import { ThemeState } from '../redux/theme/themeSlice';
+
 
 interface ThemeProviderProps {
   children: React.ReactNode;

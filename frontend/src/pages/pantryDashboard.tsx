@@ -1,7 +1,12 @@
 // pages/pantry-dashboard.tsx
 import { useState, useEffect } from "react";
 import { ChefHat, Truck, ClipboardList } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "../components/ui/tabs";
 import { StatsCard } from "../components/stats-card";
 import MealPreparationCard from "../components/meal-preparation-card";
 import { DeliveryCard } from "../components/delivery-card";
@@ -56,18 +61,18 @@ const PantryDashboard = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const [mealsResponse, deliveriesResponse, statsResponse] =
-          await Promise.all([
-            fetch(`${import.meta.env.VITE_API_URL}/api/pantry/preparations`, {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }),
-            fetch("/api/deliveries"),
-            fetch("/api/pantry-stats"),
-          ]);
+        //, deliveriesResponse, statsResponse
+        const [mealsResponse] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/api/pantry/preparations`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }),
+          fetch("/api/deliveries"),
+          fetch("/api/pantry-stats"),
+        ]);
 
         const meals = await mealsResponse.json();
         console.log("meals", meals);
@@ -76,7 +81,11 @@ const PantryDashboard = () => {
 
         setPreparations(meals);
         // setDeliveries(deliveries);
-        // setStats(stats);
+        setStats({
+          totalPreparations: 0,
+          activeDeliveries: 0,
+          completedDeliveries: 0,
+        }); //change
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -84,7 +93,10 @@ const PantryDashboard = () => {
 
     fetchData();
   }, []);
-  const handleDeliveryStatusUpdate:StatusUpdateFn = async (id: string, status: string) => {
+  const handleDeliveryStatusUpdate: StatusUpdateFn = async (
+    id: string,
+    status: string
+  ) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -209,7 +221,6 @@ const PantryDashboard = () => {
               <MealPreparationCard
                 key={meal._id}
                 meal={meal}
-                
                 className="mb-4"
               />
             ))}
