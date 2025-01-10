@@ -27,7 +27,7 @@ const app: Express = express();
 // Middleware
 app.use(helmet()); // Security headers
 app.use(compression()); // Compress responses
-pp.use(cors({
+app.use(cors({
   origin: 'https://hospital-food-management-plum.vercel.app', // Allow only the specified origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
   credentials: true // Allow credentials (cookies, authorization headers, etc.)
