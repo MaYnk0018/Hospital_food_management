@@ -1,10 +1,30 @@
 {
-  "version": 2,
-  "builds": [{ "src": "*.js", "use": "@vercel/node" }],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dist": "/"
+    "version": 2,
+    "builds": [
+      {
+        "src": "next.config.js",
+        "use": "@vercel/next"
+      },
+      {
+        "src": "api/**/*.ts",
+        "use": "@vercel/node"
+      }
+    ],
+    "rewrites": [
+      { "source": "/api/(.*)", "destination": "/api/$1" },
+      { "source": "/(.*)", "destination": "/" }
+    ],
+    "env": {
+      "NODE_ENV": "development",
+      "PORT": "3000",
+      "MONGODB_URI": "mongodb+srv://mmayankconnect:s3c9p1IjMMv9hfoR@cluster0.edkq9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      "JWT_SECRET": "cjndndv",
+      "JWT_EXPIRES_IN": "24h"
+    },
+    "functions": {
+      "api/**/*.ts": {
+        "runtime": "nodejs16.x"
+      }
     }
-  ]
-}
+  }
+  
